@@ -1,0 +1,142 @@
+<nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
+    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Hacker News</a>
+    <mat-form-field appearance="fill">
+        <mat-label>Search for</mat-label>
+        <mat-select disableOptionCentering panelClass="myPanelClass" [(value)]="SelectedType"
+            (selectionChange)="onSearchBarChange()">
+            <mat-option *ngFor="let option of searchType" [value]="option.value">
+                {{option.viewValue}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+        <mat-label>Sort by</mat-label>
+        <mat-select disableOptionCentering panelClass="myPanelClass" [(value)]="SelectedRelevance"
+            (selectionChange)="onSearchBarChange()">
+            <mat-option *ngFor="let option of searchRelevance" [value]="option.value">
+                {{option.viewValue}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+    <input (keyup)="onSearchBarChange()" (change)="afterSearchBarChange()" id="ng_searchBar" name="ng_searchBar"
+        [(ngModel)]="ng_searchBar" class="form-control form-control-dark w-100" type="text" placeholder="Search"
+        aria-label="Search">
+</nav>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card card-margin">
+                <div class="card-body">
+                    <div class="row search-body">
+                        <div class="col-lg-12">
+                            <div class="search-result">
+                                <div class="result-header">
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <div *ngIf="results | async as myResult" class="records">
+                                                <div *ngIf="myResult.hits.length > 0" class="records"></div>
+                                                Showing: <b>{{myResult.hitsPerPage}}</b> of
+                                                <b>{{myResult.nbHits}}</b> results
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <div class="result-actions">
+                                                <div class="result-sorting">
+                                                    <span>Sort By:</span>
+                                                    <select matNativeControl (change)="SortAlphabetically($event)"
+                                                        (value)="alphabeticalResults" class="form-control border-0"
+                                                        id="exampleOption">
+                                                        <option value="0">Points</option>
+                                                        <option value="1">Names (A-Z)</option>
+                                                        <option value="2">Names (Z-A)</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="result-body">
+                                    <ng-container *ngIf="results | async as myResult">
+                                        <div *ngIf="myResult.hits.length > 0">
+                                            <table class="table widget-26">
+                                                <tbody>
+                                                    <tr *ngFor="let searchResult of myResult.hits">
+                                                        <td>
+                                                            <div class="widget-26-search-title">
+                                                                <h6><a
+                                                                        href={{searchResult.url}}>{{searchResult.title}}</a>
+                                                                </h6>
+                                                                <div class="m-0">
+                                                                    <a href="http://hn.algolia.com/api/v1/search?tags=story,author_{{searchResult.author}}"
+                                                                        class="author-name">
+                                                                        {{searchResult.author}}</a>
+                                                                    <p>Comments: <span
+                                                                            class="number-comments">{{searchResult.num_comments}}</span>
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+
+                                                        <!--Story_Text is blank-->
+                                                        <!-- <td>
+                                                            <div class="widget-26-job-info">
+                                                                <p class="story-text m-0">Story Text:
+                                                                    {{searchResult.story_text}}
+                                                                </p>
+
+                                                            </div>
+                                                        </td> -->
+                                                        <td>
+                                                            <div class="widget-26-tags">Tags: {{searchResult._tags}}
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="widget-26-job-category bg-soft-base">
+                                                                <span>Points: {{searchResult.points}}</span>
+                                                            </div>
+                                                        </td>
+
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <nav class="d-flex justify-content-center" style="overflow-x: scroll; display:block !important">
+                        <ul class="pagination pagination-base pagination-boxed pagination-square mb-0">
+                            <li class="page-item">
+                                <button class="page-link no-border" (click)="previousPage()">
+                                    <span aria-hidden="true">«</span>
+                                    <span class="sr-only">Previous</span>
+                                </button>
+                            </li>
+                            <ng-container *ngIf="results | async as myResult" class="d-flex justify-content-center">
+                                <ng-container *ngFor="let pageNumber of pageNumbers"
+                                    class="pagination pagination-base pagination-boxed pagination-square mb-0">
+                                    <li>
+                                        <button id="{{pageNumber}}" class="page-link no-border"
+                                            (click)="goToPage($event)">
+                                            <span class="sr-only">{{pageNumber}}</span>
+                                        </button>
+                                    </li>
+                                </ng-container>
+                            </ng-container>
+                            <li class="page-item">
+                                <button class="page-link no-border" (click)="nextPage()">
+                                    <span aria-hidden="true">»</span>
+                                    <span class="sr-only">Next</span>
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- </div> -->

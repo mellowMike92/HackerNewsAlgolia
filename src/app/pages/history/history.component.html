@@ -1,0 +1,24 @@
+<main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+
+    <h2>Search History</h2>
+    <div class="table-responsive">
+        <div *ngIf="searchHistory">
+            <table class="table table-striped table-sm">
+                <tbody>
+                    <tr>
+                        <th>Search Term</th>
+                        <th>Time & Date</th>
+                    </tr>
+                    <tr *ngFor="let history of searchHistory; let i=index">
+                        <td>
+                            {{history}}
+                        </td>
+                        <td>
+                            {{searchTime[i]}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
