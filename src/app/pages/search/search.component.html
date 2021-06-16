@@ -35,8 +35,9 @@
                                 <div class="result-header">
                                     <div class="row">
                                         <div class="col-lg-6">
-                                            <div *ngIf="results | async as myResult" class="records">
-                                                <div *ngIf="myResult.hits.length > 0" class="records"></div>
+                                            <div *ngIf="results3 | async as myResult" class="records">
+                                                <div *ngIf="myResult.hits && myResult.hits.length > 0" class="records">
+                                                </div>
                                                 Showing: <b>{{myResult.hitsPerPage}}</b> of
                                                 <b>{{myResult.nbHits}}</b> results
                                             </div>
@@ -44,13 +45,13 @@
                                         <div class="col-lg-6">
                                             <div class="result-actions">
                                                 <div class="result-sorting">
-                                                    <span>Sort By:</span>
+                                                    <span>Sort Page By:</span>
                                                     <select matNativeControl (change)="SortAlphabetically($event)"
                                                         (value)="alphabeticalResults" class="form-control border-0"
                                                         id="exampleOption">
                                                         <option value="0">Points</option>
-                                                        <option value="1">Names (A-Z)</option>
-                                                        <option value="2">Names (Z-A)</option>
+                                                        <option value="1">Titles (A-Z)</option>
+                                                        <option value="2">Titles (Z-A)</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -59,8 +60,8 @@
                                 </div>
 
                                 <div class="result-body">
-                                    <ng-container *ngIf="results | async as myResult">
-                                        <div *ngIf="myResult.hits.length > 0">
+                                    <ng-container *ngIf="results3 | async as myResult">
+                                        <div *ngIf="myResult.hits && myResult.hits.length > 0">
                                             <table class="table widget-26">
                                                 <tbody>
                                                     <tr *ngFor="let searchResult of myResult.hits">
@@ -116,7 +117,7 @@
                                     <span class="sr-only">Previous</span>
                                 </button>
                             </li>
-                            <ng-container *ngIf="results | async as myResult" class="d-flex justify-content-center">
+                            <ng-container *ngIf="results3 | async as myResult" class="d-flex justify-content-center">
                                 <ng-container *ngFor="let pageNumber of pageNumbers"
                                     class="pagination pagination-base pagination-boxed pagination-square mb-0">
                                     <li>

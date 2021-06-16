@@ -1,6 +1,6 @@
 import { formatDate } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { SearchResults, SearchService } from 'src/app/services/searchService.component';
 interface SearchType {
   value: string;
@@ -15,7 +15,7 @@ interface SearchRelevance {
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.css', '../../app.component.css']
 })
-export class SearchComponent implements OnInit {
+export class SearchComponent implements OnInit, OnDestroy {
   ng_searchBar: string;
   searchType: SearchType[] = [
     { value: 'story-0', viewValue: 'Story' },
@@ -27,7 +27,7 @@ export class SearchComponent implements OnInit {
   ];
   SelectedType = this.searchType[0].value;
   SelectedRelevance = this.searchRelevance[0].value;
-  alphabeticalResults = "1";
+  alphabeticalResults = "0";
   hitsInPage: number = 10;
   totalHits: number = 100;
   pageNumbers = [1, 2, 3];
@@ -36,7 +36,7 @@ export class SearchComponent implements OnInit {
   searchTime: Array<string> = [];
   results = new Observable<SearchResults>();
   results2: SearchResults = <SearchResults>{};
-
+  results3 = new BehaviorSubject(<SearchResults>{});
   constructor(
     private searchService: SearchService,
   ) {
@@ -50,24 +50,25 @@ export class SearchComponent implements OnInit {
     this.results = this.searchService.getAllStories();
     this.results.subscribe(data => {
       this.results2 = data;
-      console.log(this.results2);
+      this.results3.next(data);
       (window as any).hits = this.results2;
     });
   }
   SortAlphabetically(event: Event) {
     this.alphabeticalResults = (event.target as HTMLSelectElement).value;
     this.onSearchBarChange(this.pageNumber);
-    this.results.subscribe(data => {
-      if (this.alphabeticalResults == "1") {
-        this.results2.hits = data.hits.sort((a, b) => (a.title > b.title) ? 1 : -1)
-      }
-      else if (this.alphabeticalResults == "2") {
-        this.results2.hits = data.hits.sort((a, b) => (a.title < b.title) ? 1 : -1)
-      }
-      else {
 
-      }
-    });
+    if (this.alphabeticalResults == "1") {
+      this.results2.hits = this.results2.hits.sort((a, b) => (a.title > b.title) ? 1 : -1);
+      this.results3.next(this.results2);
+    }
+    else if (this.alphabeticalResults == "2") {
+      this.results2.hits = this.results2.hits.sort((a, b) => (a.title < b.title) ? 1 : -1);
+      this.results3.next(this.results2);
+    }
+    else {
+
+    }
   }
   onSearchBarChange(pageNumber?: string) {
     console.log(this.ng_searchBar);
@@ -94,6 +95,18 @@ export class SearchComponent implements OnInit {
     }
     this.results.subscribe(data => {
       this.results2 = data;
+      if (this.alphabeticalResults == "1") {
+        this.results2.hits = this.results2.hits.sort((a, b) => (a.title > b.title) ? 1 : -1);
+        this.results3.next(this.results2);
+      }
+      else if (this.alphabeticalResults == "2") {
+        this.results2.hits = this.results2.hits.sort((a, b) => (a.title < b.title) ? 1 : -1);
+        this.results3.next(this.results2);
+      }
+      else {
+
+      }
+      this.results3.next(this.results2);
       this.pageNumbers = Array(this.results2.nbPages).fill(this.results2.nbPages).map((x, i) => i); // [0,1,2,3,4]
       this.hitsInPage = this.results2.hitsPerPage;
       this.totalHits = this.results2.nbHits;
@@ -126,5 +139,7 @@ export class SearchComponent implements OnInit {
     this.onSearchBarChange(this.pageNumber);
   }
 
-
+  ngOnDestroy() {
+    this.results3.unsubscribe();
+  }
 }
